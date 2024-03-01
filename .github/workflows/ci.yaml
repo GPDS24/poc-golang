@@ -1,3 +1,15 @@
+
+name: CI
+on:
+  push:
+    branches:
+      - main
+      - develop
+  pull_request:
+    branches:
+      - main
+      - develop
+jobs:
 # This workflow will build a golang project
 # For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-go
 
@@ -15,6 +27,31 @@ jobs:
     runs-on: ubuntu-latest
     env:
       GO_VERSION: 1.16
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up Go ${{ env.GO_VERSION }}
+        uses: actions/setup-go@v4
+        with:
+          go-version: ${{ env.GO_VERSION }}
+      - name: install dependencies
+        run: go mod download
+      - name: Build
+        run: go build -v
+      - name: Test
+        run: go test -v
+      - name: CI Successful OK
+        if: success()
+        uses: rtCamp/action-slack-notify@v2
+        with:
+          status: ${{ job.status }}
+          text: "GO CI Successfully"
+        env:
+          SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+
+
+
+
     
     steps:
     - uses: actions/checkout@v3
