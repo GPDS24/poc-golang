@@ -1,5 +1,5 @@
 name: API CI
-
+ins
 on:
    push:
     branches: [main, develop]
@@ -11,18 +11,22 @@ jobs:
       runs-on: ubuntu-latest
       steps: 
           - name: Checkout repo 
-          - uses: action/checkout@v4  #git clone into runner 
+          - uses: action/checkout@v4  #PARA CLONAR, GIT CLONE 
         
           - name: Setup Nodejs
-            uses: action/setup-node@v4 # instalar node 
+            uses: action/setup-node@v4 # CON ESTO INSTALAMOS NODE 
               with: 
                   node-version: 20.x
 
-          - name: Install Dependencies # instlr las dependencies
-          - run: npm install
+          - name: Install Dependencies # INSTALAMOS NUESTRA DEPENDENCIAS
+          - run: go mod download
 
-          - name: Run unit and integrate tests
-          - run: npm run test 
+          - name: Run unit and integrate tests # PODEMOS EJECUTAR NUESTRAS TAREAS
+          - run: go test -v
+
+          - name: Run build # NOS AYUDA EN LA COMPILACION Y EN LA ENSAMBLACION DECODIGO
+          - run: go build -v
+
 
           #- name: Run code linter
           #- run: npm run lint
