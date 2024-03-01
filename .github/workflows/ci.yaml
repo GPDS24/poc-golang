@@ -7,18 +7,23 @@ on:
       branches: [main, develop]
 
 jobs:
+
   testing:
       runs-on: ubuntu-latest
+
+      env:
+        GO_VERSION: 1.16
+
       steps: 
           - name: Checkout repo 
-          - uses: action/checkout@v4  #git clone into runner 
+          - uses: action/checkout@v4  
         
-          - name: Setup Nodejs
-            uses: action/setup-node@v4 # instalar node 
+          - name: Set up Go ${{ env.GO_VERSION }}
+            uses: action/setup-go@v4 
               with: 
-                  node-version: 20.x
+                  go-versio: ${{ env.GO_VERSION }}
 
-          - name: Install Dependencies # instlr las dependencies
+          - name: Install Dependencies 
           - run: go mod download
 
           - name: Run unit and integrate tests
@@ -27,6 +32,11 @@ jobs:
           - name: Run build
           - run: go build -v
 
-
-          #- name: Run code linter
-          #- run: npm run lint
+          - name: CI Succces
+          if: succes()
+          uses: rtCamp/action-slack-notify@v2
+          with:
+            status: 'passed'
+            text: 'Go CI succces'
+          env:
+            SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
