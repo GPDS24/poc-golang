@@ -1,32 +1,31 @@
 name: API CI
-ins
+
 on:
-   push:
+  push:
     branches: [main, develop]
   pull_request:
       branches: [main, develop]
-
 jobs:
-  testing:
-      runs-on: ubuntu-latest
-      steps: 
-          - name: Checkout repo 
-          - uses: action/checkout@v4  #GIT CLONE INTO RUNNER git clone into runner 
-        
-          - name: Setup Nodejs
-            uses: action/setup-node@v4 # instalar node 
-              with: 
-                  node-version: 20.x
-
-          - name: Install Dependencies # INSTALACIONDE LAS DEPENDENCIAS
-          - run: go mod download
-
-          - name: Run unit and integrate tests #NOS AYUDA A EJECUTAR NUESTRAS TAREAS
-          - run: go test -v
-
-          - name: Run build  #NOS AYUDA EN LA COMPILACION DE CODIGO
-          - run: go build -v
-
-
-          #- name: Run code linter
-          #- run: npm run lint
+  build:
+    runs-on: ubuntu-latest
+    env: 1.16
+  steps:
+  - uses: actions/checkout@v3
+  - name: Set up Go ${{ env.GO_VERSION }}
+    uses: actions/setup-go@v4
+    with:
+      go-version: ${{ env.GO_VERSION }}
+    - name: Install Dependencies
+    - run: go mod download
+    - name: Run unit and integrate tests
+    - run: go test -v
+    - name: Run build
+    - run: go build -v
+    - name: CI Successful Ok
+      if: success()
+      uses: rtCamp/action-slack-notify@v2
+      with:
+        status: 'passed'
+        text: 'Go CI succesfully.'
+      env:
+        SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
